@@ -1,0 +1,107 @@
+/* Glass looking styles and "ubuntu" linear gradient color scheme proper color alignment and complements*/
+
+:root {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    --primary-orange: #ff6b27;
+    --primary-purple: #b027ff;
+    --white: hsl(0, 0%, 100%);
+    --black: hsl(0, 0%, 20%);
+    --grey-75: hsl(0, 0%, 75%);
+    --grey-91: hsl(0, 0%, 91%);
+    --grey-30: hsl(0, 0%, 30%);
+}
+
+:is(*, ::before, ::after) {
+    box-sizing: inherit;
+}
+
+body {
+    color: var(--white);
+    background-image: linear-gradient(135deg, var(--primary-orange), var(--primary-purple));
+    background-repeat: no-repeat;
+    /* background-size: cover; */
+    margin: 0 auto;
+}
+
+.player {
+    display: grid;
+    grid-template-rows: repeat(4, auto);
+    gap: 1em;
+    border-radius: 1em;
+    background-color: transparent;
+}
+
+.title {
+    text-align: center;
+}
+
+.control-panel {
+    display: flex;
+    justify-content: space-around;
+}
+
+.track-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1em;
+}
+
+.track-name {
+    display: flex;
+    justify-content: center;
+    margin-top: -3em;
+}
+
+.song-tracker {
+    margin-right: 0.5em;
+}
+
+.button {
+    padding: 0.85em 1.85em;
+    /* text-shadow: 4px 4px purple; */
+    margin: 1em;
+    box-shadow: 0 0.5em var(--black);
+    background-color: var(--white);
+    color: var(--black);
+    border: none;
+    border-radius: 0.5em;
+    font-weight: 1em;
+    cursor: pointer;
+}
+
+/* todo: shuffle color for focus should still be on when the play or pause button is pressed, but it can change when the prev or next buttons are pressed */
+.button--shuffle:focus {
+    color: var(--primary-purple);
+}
+
+.button:hover {
+    background-color: var(--grey-91);
+}
+
+.button:active {
+    background-color: var(--grey-75);
+    transform: translateY(0.1em);
+    box-shadow: 0 0.4em var(--grey-30);
+    color: var(--primary-orange);
+}
+
+:is(.song-tracker, .track-number) {
+    display: none; /*set default*/
+}
+
+.progress {
+    width: 100%;
+    border-radius: 1em;
+    border-color: var(--black);
+    background-color: transparent;
+    margin: 0 1em;
+}
+
+/* this is only for firefox, chrome and safari*/
+::-moz-progress-bar,
+::-webkit-progress-bar {
+    background-color: purple;
+    border-radius: 1em;
+}
