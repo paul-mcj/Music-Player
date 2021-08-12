@@ -11,7 +11,7 @@ const progress = document.querySelector(".progress");
 const songTrackerAndTrackNumber = document.querySelectorAll("h3"); //todo:change to (.track-name)
 
 // ||| Initialize local variables
-const playlistLength = 19;
+const playlistLength = 21;
 let playlist = [];
 let currentTrack = 0;
 
@@ -21,7 +21,7 @@ buttonPause.style.display = "none";
 
 // ||| Build the array of audio tracks
 for (i = 1; i <= playlistLength + 1; i++) {
-    let index = `./tracks/track${i}.wav`;
+    let index = `./tracks/track${i}.mp3`;
     let track = new Audio(index);
     playlist.push(track);
 }
