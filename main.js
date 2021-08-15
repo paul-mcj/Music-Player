@@ -5,10 +5,12 @@ const buttonNext = document.querySelector(".button--next");
 const buttonPrev = document.querySelector(".button--prev");
 const buttonShuffle = document.querySelector(".button--shuffle");
 const track = document.querySelector(".track-number");
+const trackName = document.querySelector(".track-name");
+const trackInfo = document.querySelector(".track-info");
 const trackTimeStart = document.querySelector(".track-time__start");
 const trackTimeEnd = document.querySelector(".track-time__end");
 const progress = document.querySelector(".progress");
-const trackName = document.querySelectorAll(".track-name > h3");
+const withinTrackName = document.querySelectorAll(".track-name > h3");
 
 // ||| Initialize local variables
 const playlistLength = 21;
@@ -40,7 +42,10 @@ function loadEventListeners() {
 
 // ||| Determines if the event plays or pauses the current song and sets the button accordingly
 function playAndPause(event) {
-    if (event.target.classList.contains("button--play")) {
+    if (
+        event.target.classList.contains("button--play") ||
+        event.target.parentElement.classList.contains("button--play")
+    ) {
         playlist[currentTrack].play();
         showPauseButtonAndTrackNumber();
         // trackTime(); fixme: don't reinstate until progress bar works for all songs
@@ -49,23 +54,40 @@ function playAndPause(event) {
         buttonPause.replaceWith(buttonPlay);
         buttonPlay.style.display = "block";
     }
+    showTrackNameAndInfo();
 }
 
 // ||| Makes it so that every song other than the current one is not playing and will restart from the beginning if it is played again. It then checks the next song to be played (depending on if it was "next" or "previous" in the playlist), sets the counter and makes that the new current song to play.
 function playlistLogic(event) {
     playlist[currentTrack].pause();
     playlist[currentTrack].currentTime = 0;
-    if (event.target.classList.contains("button--prev")) {
+    if (
+        event.target.classList.contains("button--prev") ||
+        event.target.parentElement.classList.contains("button--prev")
+    ) {
         checkBeginning();
-    } else if (event.target.classList.contains("button--next")) {
+    } else if (
+        event.target.classList.contains("button--next") ||
+        event.target.parentElement.classList.contains("button--next")
+    ) {
         checkEnd();
-    } else if (event.target.classList.contains("button--shuffle")) {
+    } else if (
+        event.target.classList.contains("button--shuffle") ||
+        event.target.parentElement.classList.contains("button--shuffle")
+    ) {
         shufflePlaylist();
     }
     track.textContent = currentTrack + 1;
     playlist[currentTrack].play();
     showPauseButtonAndTrackNumber();
+    showTrackNameAndInfo();
     // trackTime(); fixme: don't reinstate until progress bar works for all songs
+}
+
+// ||| This function simply allows the (.track-name) and (.track-info) divs of the html to be properly formatted the first time a user clicks on a button to start the music player app -- this is needed as these divs are hidden by default.
+function showTrackNameAndInfo() {
+    trackName.style.display = "flex";
+    trackInfo.style.display = "flex";
 }
 
 // ||| Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
@@ -76,8 +98,6 @@ function shufflePlaylist() {
     let randomTrack = randomize();
     if (randomTrack !== currentTrack) {
         currentTrack = randomTrack;
-        console.log(currentTrack);
-
         return currentTrack;
     } else {
         shufflePlaylist();
@@ -88,7 +108,7 @@ function shufflePlaylist() {
 function showPauseButtonAndTrackNumber() {
     buttonPlay.replaceWith(buttonPause);
     buttonPause.style.display = "block";
-    trackName.forEach(function (track) {
+    withinTrackName.forEach(function (track) {
         track.style.display = "inline";
     });
 }
@@ -151,7 +171,6 @@ function trackTime() {
     }
 }
 
-// fixme: button event listeners aren't working when clicking the icon in the button (only the space within the button), must FIX with event delegation so the ENTIRE button fires the event!!!
 //todo: add repeat function
 //todo: make progress bar transition smoother?
 //todo: add slider functionality to have users skip through songs
@@ -159,3 +178,4 @@ function trackTime() {
 //todo: check audio files have loaded in before starting (NaN is begin returned prematurely for the tractTime() function) -- add an alert that music cannot be played when files are loading
 //todo: persist storage?
 //todo: drag and drop for playlists eventually
+// todo: slideshow of pics for each song

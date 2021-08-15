@@ -5,9 +5,6 @@
     --primary-purple: #b027ff;
     --white: hsl(0, 0%, 100%);
     --black: hsl(0, 0%, 20%);
-    --grey-75: hsl(0, 0%, 75%);
-    --grey-91: hsl(0, 0%, 91%);
-    --grey-30: hsl(0, 0%, 30%);
 }
 
 :is(*, ::before, ::after) {
@@ -18,7 +15,6 @@ body {
     color: var(--white);
     background-image: linear-gradient(135deg, var(--primary-orange), var(--primary-purple));
     background-repeat: no-repeat;
-    /* background-size: cover; */
     margin: 0 auto;
 }
 
@@ -40,14 +36,14 @@ body {
 }
 
 .track-info {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     padding: 0 1em;
 }
 
 .track-name {
-    display: flex;
+    display: none;
     justify-content: center;
     margin-top: -3em;
 }
@@ -68,24 +64,21 @@ body {
     box-shadow: -0.08em 0em var(--white), 0.08em 0em var(--white);
 }
 
-/* todo: shuffle color for focus should still be on when the play or pause button is pressed, but it can change when the prev or next buttons are pressed */
+/* todo: shuffle-button needs to have some style when its activated. should still be on when the play or pause button is pressed, but is changed when the prev or next buttons are pressed */
 .button--shuffle:focus {
+    color: var(--black);
     --white: var(--black);
 }
 
 .button:hover {
     box-shadow: 0em 0.08em var(--white), 0em -0.08em var(--white);
-    transition: box-shadow 0.5s ease-out 0s;
+    transition: box-shadow 0.5s ease-out;
 }
 
 .button:active {
-    --white: var(--black);
+    box-shadow: 0.08em -0.08em var(--white), -0.08em 0.08em var(--white);
     transform: rotateX(180deg);
     transition: ease-in-out 0.5s;
-}
-
-:is(.song-tracker, .track-number) {
-    display: none; /*set default*/
 }
 
 .progress {
