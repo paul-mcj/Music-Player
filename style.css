@@ -1,8 +1,6 @@
-/* Glass looking styles and "ubuntu" linear gradient color scheme proper color alignment and complements*/
-
 :root {
     box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Nunito", sans-serif;
     --primary-orange: #ff6b27;
     --primary-purple: #b027ff;
     --white: hsl(0, 0%, 100%);
@@ -59,32 +57,31 @@ body {
 }
 
 .button {
-    padding: 0.85em 1.85em;
-    /* text-shadow: 4px 4px purple; */
+    padding: 0.8em 1.8em;
     margin: 1em;
-    box-shadow: 0 0.5em var(--black);
-    background-color: var(--white);
-    color: var(--black);
+    background-color: transparent;
+    color: var(--white);
     border: none;
-    border-radius: 0.5em;
-    font-weight: 1em;
+    border-radius: 0.4em;
+    font-size: 0.8em;
     cursor: pointer;
+    box-shadow: -0.08em 0em var(--white), 0.08em 0em var(--white);
 }
 
 /* todo: shuffle color for focus should still be on when the play or pause button is pressed, but it can change when the prev or next buttons are pressed */
 .button--shuffle:focus {
-    color: var(--primary-purple);
+    --white: var(--black);
 }
 
 .button:hover {
-    background-color: var(--grey-91);
+    box-shadow: 0em 0.08em var(--white), 0em -0.08em var(--white);
+    transition: box-shadow 0.5s ease-out 0s;
 }
 
 .button:active {
-    background-color: var(--grey-75);
-    transform: translateY(0.1em);
-    box-shadow: 0 0.4em var(--grey-30);
-    color: var(--primary-orange);
+    --white: var(--black);
+    transform: rotateX(180deg);
+    transition: ease-in-out 0.5s;
 }
 
 :is(.song-tracker, .track-number) {
@@ -94,7 +91,7 @@ body {
 .progress {
     width: 100%;
     border-radius: 1em;
-    border-color: var(--black);
+    border-color: var(--white);
     background-color: transparent;
     margin: 0 1em;
 }
@@ -102,6 +99,6 @@ body {
 /* this is only for firefox, chrome and safari*/
 ::-moz-progress-bar,
 ::-webkit-progress-bar {
-    background-color: purple;
-    border-radius: 1em;
+    background-color: var(--white);
+    border-radius: 5em;
 }
