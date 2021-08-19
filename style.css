@@ -1,6 +1,10 @@
 :root {
     box-sizing: border-box;
     font-family: "Nunito", sans-serif;
+    --grow-size-one: calc(0.9em + 0.5vw);
+    --size-one: 1em;
+    --size-half: 0.5em;
+    --position-center: center;
     --primary-orange: #ff6b27;
     --primary-purple: #b027ff;
     --white: hsl(0, 0%, 100%);
@@ -9,25 +13,38 @@
 
 :is(*, ::before, ::after) {
     box-sizing: inherit;
+    font-family: inherit;
+    font-size: var(--grow-size-one);
 }
 
 body {
+    margin: 0 auto;
+    min-height: 100vh;
     color: var(--white);
     background-image: linear-gradient(135deg, var(--primary-orange), var(--primary-purple));
     background-repeat: no-repeat;
-    margin: 0 auto;
+}
+
+body * + * {
+    margin: 0;
+}
+
+footer {
+    font-size: 0.65em;
+    text-align: var(--position-center);
+    margin-top: calc(6 * var(--size-one));
 }
 
 .player {
     display: grid;
     grid-template-rows: repeat(4, auto);
-    gap: 1em;
-    border-radius: 1em;
+    gap: var(--size-one);
     background-color: transparent;
 }
 
 .title {
-    text-align: center;
+    text-align: var(--position-center);
+    font-size: calc(2 * var(--size-one));
 }
 
 .control-panel {
@@ -36,62 +53,92 @@ body {
 }
 
 .track-info {
+    margin-top: var(--size-half);
     display: none;
-    justify-content: center;
-    align-items: center;
-    padding: 0 1em;
+    justify-content: var(--position-center);
+    align-items: var(--position-center);
+    padding: 0 var(--size-one);
 }
 
 .track-name {
     display: none;
-    justify-content: center;
-    margin-top: -3em;
+    justify-content: var(--position-center);
+    font-size: var(--size-one);
+    margin-top: -2em;
+}
+
+.track-name > * {
+    margin-top: var(--size-one);
 }
 
 .song-tracker {
-    margin-right: 0.5em;
+    margin-right: var(--size-half);
+}
+
+.button--prev,
+.button--next,
+.button--repeat,
+.button--shuffle {
+    display: none;
 }
 
 .button {
-    padding: 0.8em 1.8em;
-    margin: 1em;
+    font-size: 0.75em;
+    padding: 0.75em 1.75em;
     background-color: transparent;
     color: var(--white);
     border: none;
     border-radius: 0.4em;
-    font-size: 0.8em;
     cursor: pointer;
     box-shadow: -0.08em 0em var(--white), 0.08em 0em var(--white);
 }
-
-/* todo: shuffle-button needs to have some style when its activated. should still be on when the play or pause button is pressed, but is changed when the prev or next buttons are pressed */
-.button--shuffle:focus {
-    color: var(--black);
-    --white: var(--black);
+@media (min-width: 40em) {
+    .button {
+        box-shadow: none;
+        font-size: 1.25em;
+    }
 }
+@media (min-width: 40em) {
+    .button:hover {
+        box-shadow: -0.04em 0.04em var(--white), 0.04em -0.04em var(--white);
+        transition: ease-out 0.5s;
+    }
 
-.button:hover {
-    box-shadow: 0em 0.08em var(--white), 0em -0.08em var(--white);
-    transition: box-shadow 0.5s ease-out;
-}
+    .button--prev:active {
+        transform: translateX(-1em);
+    }
 
-.button:active {
-    box-shadow: 0.08em -0.08em var(--white), -0.08em 0.08em var(--white);
-    transform: rotateX(180deg);
-    transition: ease-in-out 0.5s;
+    .button--next:active {
+        transform: translateX(1em);
+    }
+
+    .button--shuffle:active {
+        transform: rotateX(180deg);
+        transition: box-shadow 0.5s ease-out;
+    }
+    .button--repeat:active {
+        transform: rotateZ(-180deg);
+        transition: box-shadow 0.5s ease-out;
+    }
 }
 
 .progress {
     width: 100%;
-    border-radius: 1em;
+    max-height: 1.5vh;
+    border-radius: var(--size-one);
     border-color: var(--white);
     background-color: transparent;
-    margin: 0 1em;
+    margin: 0 var(--size-one);
+}
+@media (min-width: 40em) {
+    .progress {
+        max-height: 4vh;
+    }
 }
 
 /* this is only for firefox, chrome and safari*/
 ::-moz-progress-bar,
 ::-webkit-progress-bar {
     background-color: var(--white);
-    border-radius: 5em;
+    border-radius: 4em;
 }

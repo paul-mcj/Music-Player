@@ -4,6 +4,7 @@ const buttonPause = document.querySelector(".button--pause");
 const buttonNext = document.querySelector(".button--next");
 const buttonPrev = document.querySelector(".button--prev");
 const buttonShuffle = document.querySelector(".button--shuffle");
+const buttonRepeat = document.querySelector(".button--repeat");
 const track = document.querySelector(".track-number");
 const trackName = document.querySelector(".track-name");
 const trackInfo = document.querySelector(".track-info");
@@ -38,6 +39,7 @@ function loadEventListeners() {
     buttonNext.addEventListener("click", playlistLogic);
     buttonPrev.addEventListener("click", playlistLogic);
     buttonShuffle.addEventListener("click", playlistLogic);
+    buttonRepeat.addEventListener("click", playlistLogic);
 }
 
 // ||| Determines if the event plays or pauses the current song and sets the button accordingly
@@ -54,7 +56,7 @@ function playAndPause(event) {
         buttonPause.replaceWith(buttonPlay);
         buttonPlay.style.display = "block";
     }
-    showTrackNameAndInfo();
+    showHidden();
 }
 
 // ||| Makes it so that every song other than the current one is not playing and will restart from the beginning if it is played again. It then checks the next song to be played (depending on if it was "next" or "previous" in the playlist), sets the counter and makes that the new current song to play.
@@ -76,18 +78,27 @@ function playlistLogic(event) {
         event.target.parentElement.classList.contains("button--shuffle")
     ) {
         shufflePlaylist();
+    } else if (
+        event.target.classList.contains("button--repeat") ||
+        event.target.parentElement.classList.contains("button--repeat")
+    ) {
+        repeatSong();
     }
     track.textContent = currentTrack + 1;
     playlist[currentTrack].play();
     showPauseButtonAndTrackNumber();
-    showTrackNameAndInfo();
+    showHidden();
     // trackTime(); fixme: don't reinstate until progress bar works for all songs
 }
 
-// ||| This function simply allows the (.track-name) and (.track-info) divs of the html to be properly formatted the first time a user clicks on a button to start the music player app -- this is needed as these divs are hidden by default.
-function showTrackNameAndInfo() {
+// ||| The first time a user clicks on a valid button to start the music player app, any elements of the original html with a display "hidden" are shown.
+function showHidden() {
     trackName.style.display = "flex";
     trackInfo.style.display = "flex";
+    buttonRepeat.style.display = "block";
+    buttonShuffle.style.display = "block";
+    buttonPrev.style.display = "block";
+    buttonNext.style.display = "block";
 }
 
 // ||| Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
@@ -102,6 +113,13 @@ function shufflePlaylist() {
     } else {
         shufflePlaylist();
     }
+}
+
+// ||| Repeats the current song in the playlist
+function repeatSong() {
+    playlist[currentTrack].pause();
+    playlist[currentTrack].currentTime = 0;
+    playlist[currentTrack].play();
 }
 
 // ||| Make sure that every time a new song is played, the default function of the middle button (ie. the play and pause button) is always to pause the current track by hiding the play button -- the only time the pause icon is displayed is if the user clicks the play button or when the page reloads.
@@ -171,7 +189,7 @@ function trackTime() {
     }
 }
 
-//todo: add repeat function
+//todo: add repeat function: make it repeat after the current song is done playing (need to check if current song is still playing?). change from current logic of simply restarting the song from the beginning
 //todo: make progress bar transition smoother?
 //todo: add slider functionality to have users skip through songs
 //todo: add volume control
