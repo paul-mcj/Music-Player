@@ -5,6 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Music Player</title>
+        <script src="main.js" defer></script>
         <link rel="stylesheet" href="style.css" />
         <link
             rel="stylesheet"
@@ -23,6 +24,7 @@
             <h1 class="title">Music Player</h1>
             <div class="control-panel">
                 <!-- todo: Add pictures tied to every track that loop through depending on which song is playing. Place that div here before the buttons -->
+                <input type="range" class="volume-control" value="50" step="5" />
                 <button class="button button--repeat" title="Repeat">
                     <i class="fas fa-retweet"></i>
                 </button>
@@ -44,7 +46,8 @@
             </div>
             <div class="track-info">
                 <p class="track-time track-time__start"></p>
-                <progress class="progress" value="0" max="0"></progress>
+                <input type="range" class="progress" min="0" max="0" step="1" />
+                <!-- <progress class="progress" value="0" max="0"></progress> -->
                 <p class="track-time track-time__end"></p>
             </div>
             <div class="track-name">
@@ -54,7 +57,9 @@
                 </h3>
             </div>
         </div>
-        <footer>Copyright &copy;McJBeats</footer>
-        <script src="main.js"></script>
+        <footer>
+            Copyright &copy;McJBeats
+            <span>v1.0.7</span>
+        </footer>
     </body>
 </html>
