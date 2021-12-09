@@ -23,10 +23,9 @@
         <div class="player">
             <h1 class="title">Music Player</h1>
             <div class="control-panel">
-                <!-- todo: Add pictures tied to every track that loop through depending on which song is playing. Place that div here before the buttons -->
-                <input type="range" class="volume-control" value="50" step="5" />
                 <button class="button button--repeat" title="Repeat">
                     <i class="fas fa-retweet"></i>
+                    <i class="repeat"></i>
                 </button>
                 <button class="button button--prev" title="Previous">
                     <i class="fas fa-step-backward"></i>
@@ -42,24 +41,30 @@
                 </button>
                 <button class="button button--shuffle" title="Shuffle">
                     <i class="fas fa-random"></i>
+                    <i class="shuffle"></i>
                 </button>
             </div>
             <div class="track-info">
-                <p class="track-time track-time__start"></p>
-                <input type="range" class="progress" min="0" max="0" step="1" />
-                <!-- <progress class="progress" value="0" max="0"></progress> -->
-                <p class="track-time track-time__end"></p>
+                <p class="track-time track-time__start">0:00</p>
+                <input type="range" class="progress" value="0" title="Seek" />
+                <p class="track-time track-time__end">0:00</p>
             </div>
             <div class="track-name">
                 <h3 class="song-tracker">
                     Current Track:
                     <h3 class="track-number"></h3>
                 </h3>
+                <div class="volume-section">
+                    <!-- <button class="volume-change"> -->
+                    <!-- <i class="fas fa-volume-down"></i> -->
+                    <!-- </button> -->
+                    <input type="range" class="volume-control" value="50" step="1" />
+                </div>
             </div>
         </div>
         <footer>
-            Copyright &copy;McJBeats
-            <span>v1.0.7</span>
+            &copy; &copysr; 2021 mcjbeats
+            <span style="padding-left: 3em">v1.1.0</span>
         </footer>
     </body>
 </html>

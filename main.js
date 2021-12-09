@@ -1,4 +1,38 @@
-// ||| Global variables for DOM manipulation
+/*JS file for Music Player "index.html"*/
+
+/******************************************************************************
+	Table of Contents
+	-----------------
+	1. Global Variables and App Initialization Measures
+	2. Event Listeners
+	3. UI-specific Functions
+        3.1 -- playTrack()
+        3.2 -- pauseTrack()
+        3.3 -- nextTrack()
+        3.4 -- prevTrack()
+        3.5 -- repeatTrack()
+        3.6 -- shuffleTrack()
+        3.7 -- inputCurrentTime()
+        3.8 -- showCurrentTime()
+        3.9 -- showHidden()
+        3.10 -- showVolumeControl()
+        3.11 -- changeVolumeIcon()
+    4. Global Functions
+        4.1 -- getCurrentTime()
+        4.2 -- setVolume()
+        4.3 -- playlistLogic()
+        4.4 -- updateTrack()
+        4.5 -- checkEndOfSong()
+        4.6 -- shufflePlaylist()
+        4.7 -- formatTime(time)
+        
+*******************************************************************************/
+
+/******************************************************************************
+1. Global Variables and App Initialization Measures
+******************************************************************************/
+
+// Global variables for DOM manipulation
 const buttonPlay = document.querySelector(".button--play");
 const buttonPause = document.querySelector(".button--pause");
 const buttonNext = document.querySelector(".button--next");
@@ -13,24 +47,29 @@ const trackInfo = document.querySelector(".track-info");
 const trackTimeStart = document.querySelector(".track-time__start");
 const trackTimeEnd = document.querySelector(".track-time__end");
 const progress = document.querySelector(".progress");
+const volumeChange = document.querySelector(".volume-change");
 
-// ||| Initialize local variables -- some of these can be changed depending on the number of tracks to be added to the playlist over time
-const playlistLength = 21;
+// Initialized variables -- some of these can be changed depending on the number of tracks to be added to the playlist over time
 let playlist = [];
+const playlistLength = 6;
 let currentTrack = 0;
 track.textContent = 1;
 
-// ||| Build the array of audio tracks
+// Build the array of audio tracks
 for (i = 1; i <= playlistLength + 1; i++) {
     let index = `./tracks/track${i}.mp3`;
     let track = new Audio(index);
     playlist.push(track);
 }
 
-// ||| Function will call all event listeners
+// Call this function when starting up the app
 loadEventListeners();
 
-// ||| Loads all event listeners
+/******************************************************************************
+2. Event Listeners
+******************************************************************************/
+
+// Loads all event listeners
 function loadEventListeners() {
     buttonPlay.addEventListener("click", playTrack);
     buttonPause.addEventListener("click", pauseTrack);
@@ -38,11 +77,17 @@ function loadEventListeners() {
     buttonPrev.addEventListener("click", prevTrack);
     buttonShuffle.addEventListener("click", shuffleTrack);
     buttonRepeat.addEventListener("click", repeatTrack);
+    progress.addEventListener("input", inputCurrentTime);
+    // volumeChange.addEventListener("click", changeVolumeIcon);
     volumeControl.addEventListener("input", setVolume);
     window.addEventListener("resize", showVolumeControl);
 }
 
-// ||| Plays the currentTrack and replaces the play button with the pause button. Sets the volume for the currentTrack, and will also display all other buttons and the volume control.
+/******************************************************************************
+3. UI-specific Functions
+******************************************************************************/
+
+// 3.1 Handles a lot of logic when staring the app as well as when any song needs to play: sets the volume for the currentTrack; replaces the play button with the pause button; displays all other buttons and the volume control; defines the trackEndTime to display; defines the current time of the song to display, and checks what the next song played will be.
 function playTrack() {
     playlist[currentTrack].play();
     setVolume();
@@ -50,28 +95,36 @@ function playTrack() {
     buttonPause.style.display = "block";
     showHidden();
     showVolumeControl();
-    //todo: include songProgress(); once input range is working properly
+    trackTimeEnd.textContent = formatTime(playlist[currentTrack].duration);
+    trackTimeStart.textContent = "0:00";
+    showCurrentTime();
+    checkEndOfSong();
 }
 
-// ||| Pauses the currentTrack and replaces the pause button with the play button
+// 3.2 Pauses the currentTrack and replaces the pause button with the play button
 function pauseTrack() {
     playlist[currentTrack].pause();
     buttonPause.replaceWith(buttonPlay);
     buttonPlay.style.display = "block";
 }
 
-// ||| Checks if the current song is at the end of the playlist. If it is then the next song cycles back to the beginning, otherwise its simply the next song in the array.
+// 3.3 Checks if the current song is at the end of the playlist. If it is then the next song cycles back to the beginning, otherwise its simply the next song in the array. If the shuffle function is active, a random track is chosen as the next track. If the user explicitly clicks the next button while a repeat function is in affect, it is removed.
 function nextTrack() {
     playlistLogic();
+    if (buttonShuffle.children[1].classList.contains("shuffle-active")) {
+        shufflePlaylist();
+    }
     if (currentTrack < playlistLength) {
         currentTrack++;
     } else {
         currentTrack = 0;
     }
+    buttonRepeat.children[1].classList.remove("fas", "one", "fa-circle", "infinity", "fa-infinity");
+    buttonRepeat.children[1].classList.add("repeat");
     updateTrack();
 }
 
-// ||| Checks if the current song is at the beginning of the playlist, if it is then the next song played (ie. the "previous" one in the playlist) cycles back to the end of the playlist.
+// 3.4 Checks if the current song is at the beginning of the playlist, if it is then the next song played (ie. the "previous" one in the playlist) cycles back to the end of the playlist. If the previous button is clicked while the repeat function is enabled, it is removed instead.
 function prevTrack() {
     playlistLogic();
     if (currentTrack > 0) {
@@ -79,38 +132,53 @@ function prevTrack() {
     } else if (currentTrack <= 0) {
         currentTrack = playlistLength;
     }
+    buttonRepeat.children[1].classList.remove("fas", "one", "fa-circle", "infinity", "fa-infinity");
+    buttonRepeat.children[1].classList.add("repeat");
     updateTrack();
 }
 
-// ||| Calls the recursive function shufflePlaylist to find a new unique track to set as the newest currentTrack and play it.
-function shuffleTrack() {
-    playlistLogic();
-    shufflePlaylist();
-    updateTrack();
-}
-
-// ||| Repeats the current song in the playlist
+// 3.5 Repeats the current song in the playlist only once if the button is clicked once. It replays the song infinitely if clicked once more. Clicked a third time re-sets it back to the default (ie. repeat is removed).
 function repeatTrack() {
-    playlistLogic();
-    playlist[currentTrack].play();
-    updateTrack();
+    if (buttonRepeat.children[1].classList.contains("repeat")) {
+        buttonRepeat.children[1].classList.remove("repeat");
+        buttonRepeat.children[1].classList.add("one", "fas", "fa-circle");
+    } else if (buttonRepeat.children[1].classList.contains("one")) {
+        buttonRepeat.children[1].classList.remove("one", "fa-circle");
+        buttonRepeat.children[1].classList.add("infinity", "fas", "fa-infinity");
+    } else if (buttonRepeat.children[1].classList.contains("infinity")) {
+        buttonRepeat.children[1].classList.remove("infinity", "fas", "fa-infinity");
+        buttonRepeat.children[1].classList.add("repeat");
+    }
 }
 
-// ||| Updates the currentTrack number for the user and also calls the playTrack() function to have the song start playing (used in conjunction with other functions)
-function updateTrack() {
-    track.textContent = currentTrack + 1;
-    playTrack();
+// 3.6 Enables the shuffling feature by adding an "active" class to the button.
+function shuffleTrack() {
+    if (buttonShuffle.children[1].classList.contains("shuffle")) {
+        buttonShuffle.children[1].classList.add("fas", "fa-circle", "shuffle-active");
+        buttonShuffle.children[1].classList.remove("shuffle");
+    } else {
+        buttonShuffle.children[1].classList.remove("fas", "fa-circle", "shuffle-active");
+        buttonShuffle.children[1].classList.add("shuffle");
+    }
 }
 
-// ||| Pauses the currentTrack and resets it currentTime back to the beginning (used in conjunction with other functions)
-function playlistLogic() {
-    playlist[currentTrack].pause();
-    playlist[currentTrack].currentTime = 0;
+// 3.7 Allows the user to seek through the song by using the slider bar
+function inputCurrentTime() {
+    progress.max = 99; //stop the user from seeking to the limit of 100, otherwise songs go into an infinite state
+    let sliderInput = (playlist[currentTrack].duration * progress.value) / 100;
+    playlist[currentTrack].currentTime = sliderInput;
 }
 
-// ||| The first time a user clicks on the play button to start the music player app, all other buttons of the original html with "display:none" are then changed to be shown.
+// 3.8 Displays the current time of the current track. Updates every 100ms.
+function showCurrentTime() {
+    setInterval(() => {
+        progress.value = (getCurrentTime() / playlist[currentTrack].duration) * 100;
+        trackTimeStart.textContent = formatTime(getCurrentTime());
+    }, 100);
+}
+
+// 3.9 The first time a user clicks on the play button to start the music player app, all other buttons of the original html with "display:none" are then changed to be shown.
 function showHidden() {
-    // fixme: add transitions??
     trackName.style.display = "flex";
     trackInfo.style.display = "flex";
     buttonRepeat.style.display = "block";
@@ -119,10 +187,11 @@ function showHidden() {
     buttonNext.style.display = "block";
 }
 
-// ||| Makes sure that the volume control only shows on non-mobile displays.
+// 3.10 Makes sure that the volume control only shows on non-mobile displays.
 function showVolumeControl() {
-    // The number 640 is used as the limiter because it is 40em divided by 16 in pixels. 40em is the breakpoint in the CSS file from mobile to larger displays, so its used here for consistency, and 16 is the default calculated value used in the CSS, too as determined by the global font-size.
-    // Check a random button's current display before showing the volume control element -- if it is still not showing, neither should volume control. But if the button is showing, then the innerWidth of the page must not be mobile device for the control to show, too.
+    // The number 640 is used as the limiter because it is 40em divided by 16 in pixels. 40em is the breakpoint in the CSS file from mobile to larger displays, so its used here for consistency, and 16 is the default calculated value used in the CSS too, as determined by the global font-size.
+    // Check a button's current display before showing the volume control element -- if it is still not showing, neither should volume control (buttonShuffle is picked here, but any of the major buttons would do).
+    // But if the button is showing, then the innerWidth of the page must not be mobile device for the control to show, too.
     if (window.innerWidth > 639 && buttonShuffle.style.display === "block") {
         volumeControl.style.display = "block";
     } else {
@@ -130,18 +199,99 @@ function showVolumeControl() {
     }
 }
 
-// ||| Gathers the value of the volumeControl element and sets the current track's volume to that number
-function setVolume() {
-    playlist[currentTrack].volume = volumeControl.value / 100;
+// 3.11 todo: if the button is cliked, then mute it, otherwise turn it back to the last volume level. change the icon to me mute if its silent, little volume if its quiet-ish, and loud icon when its like over 70%.
+function changeVolumeIcon() {
+    if (!volumeChange.children[0].classList.contains("fa-volume-mute")) {
+        console.log(volumeChange.children[0].classList);
+        volumeChange.children[0].classList.add("fas", "fa-volume-mute");
+        //set the volume to zero
+    }
+
+    // if (buttonRepeat.children[1].classList.contains("repeat")) {
+    //     buttonRepeat.children[1].classList.remove("repeat");
+    //     buttonRepeat.children[1].classList.add("one", "fas", "fa-circle");
+    // } else if (buttonRepeat.children[1].classList.contains("one")) {
+    //     buttonRepeat.children[1].classList.remove("one", "fa-circle");
+    //     buttonRepeat.children[1].classList.add("infinity", "fas", "fa-infinity");
+    // } else if (buttonRepeat.children[1].classList.contains("infinity")) {
+    //     buttonRepeat.children[1].classList.remove("infinity", "fas", "fa-infinity");
+    //     buttonRepeat.children[1].classList.add("repeat");
+    // }
 }
 
-// ||| Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
+/******************************************************************************
+4. Global Functions
+******************************************************************************/
+
+// 4.1 get the current time of the current track playing
+function getCurrentTime() {
+    return playlist[currentTrack].currentTime;
+}
+
+// 4.2 Gathers the value of the volumeControl element and sets the current track's volume to that number. If the volume is at zero, display the volumeChange button as muted; if its between 1 and 70%, show the volume-down icon; if its higher than 70%, show the volume-up icon.
+function setVolume() {
+    let volume = (playlist[currentTrack].volume = volumeControl.value / 100);
+    // if (volume === 0) {
+    //     volumeChange.children[0].classList.add("fas", "fa-volume-mute");
+    //     volumeChange.children[0].classList.remove("fa-volume-down", "fa-volume-up");
+    // } else if (volume > 0 && volume < 0.7) {
+    //     volumeChange.children[0].classList.add("fas", "fa-volume-down");
+    //     volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-up");
+    // } else if (volume >= 0.7) {
+    //     volumeChange.children[0].classList.add("fas", "fa-volume-up");
+    //     volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-down");
+    // }
+    return volume;
+}
+
+// 4.3 Pauses the currentTrack and resets its currentTime back to the beginning (used in conjunction with other functions). This function is paramount in making sure audio tracks don't produce overlapping audio.
+function playlistLogic() {
+    playlist[currentTrack].pause();
+    playlist[currentTrack].currentTime = 0;
+}
+
+// 4.4 Updates the currentTrack number for the display, and also calls the playTrack() function to have the song start playing (used in conjunction with other functions).
+function updateTrack() {
+    track.textContent = currentTrack + 1;
+    playTrack();
+}
+
+// 4.5 This function decides what happens to the next played song in the playlist, depending on the current states of the shuffle and repeat buttons.
+function checkEndOfSong() {
+    setInterval(() => {
+        //check if the current song duration has reached its end (this is checked every three seconds)
+        if (playlist[currentTrack].currentTime === playlist[currentTrack].duration) {
+            //check status of repeat button
+            if (buttonRepeat.children[1].classList.contains("one")) {
+                playlistLogic();
+                playTrack();
+                buttonRepeat.children[1].classList.remove("one", "fas", "fa-circle");
+                buttonRepeat.children[1].classList.add("repeat");
+            } else if (buttonRepeat.children[1].classList.contains("infinity")) {
+                playlistLogic();
+                playTrack();
+            }
+            //check status of shuffle button
+            else if (buttonShuffle.children[1].classList.contains("shuffle-active")) {
+                playlistLogic();
+                shufflePlaylist();
+                updateTrack();
+            }
+            //default is to play the next song
+            else if (buttonRepeat.children[1].classList.contains("repeat")) {
+                nextTrack();
+            }
+        }
+    }, 3000);
+}
+
+// 4.6 Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
 function shufflePlaylist() {
     function randomize() {
         return Math.floor(Math.random() * (playlistLength - 0 + 1));
     }
     let randomTrack = randomize();
-    if (randomTrack !== currentTrack) {
+    if (randomTrack !== currentTrack && randomTrack !== currentTrack + 1) {
         currentTrack = randomTrack;
         return currentTrack;
     } else {
@@ -149,53 +299,15 @@ function shufflePlaylist() {
     }
 }
 
-// function songProgress() {
-//     let seconds = 0;
-//     let minutes = 0;
-//     let mins = Math.floor(playlist[currentTrack].duration / 60);
-//     let secs = Math.floor(playlist[currentTrack].duration % 60);
-//     let progressValue = playlist[currentTrack].duration / 100;
-//     let progressMax = playlist[currentTrack].duration;
-//     trackTimeStart.textContent = "0:00";
-//     if (secs >= 10) {
-//         trackTimeEnd.textContent = `${mins}:${secs}`;
-//     } else {
-//         trackTimeEnd.textContent = `${mins}:0${secs}`;
-//     }
-
-//     progress.setAttribute("max", progressMax);
-
-//     setInterval(countingSeconds, 1000);
-//     //todo: add automatic next song when the duration of a song is reached -- the trackTimeStart and progress bar cannot go past the duration of a song!!!
-//     //fixme: restart this function to 0 once a new current song is playing (and pause the numbers when pause is evoked)
-//     function countingSeconds() {
-//         seconds++;
-//         //todo: switch//case statements
-//         if (seconds < 10) {
-//             trackTimeStart.textContent = `${minutes}:0${seconds}`;
-//         }
-//         if (seconds > 9 && seconds < 60) {
-//             trackTimeStart.textContent = `${minutes}:${seconds}`;
-//         } else if (seconds > 59) {
-//             seconds = 0;
-//             minutes++;
-//             trackTimeStart.textContent = `${minutes}:0${seconds}`;
-//         }
-//         progressValue++;
-//         progress.setAttribute("value", progressValue);
-//         console.log(`track = ${currentTrack}    value = ${progressValue}   max = ${progressMax}`);
-//         if (progressValue === progressMax || progressValue >= progressMax) {
-//             console.log("next song");
-//             nextTrack();
-//         }
-//     }
-// }
-
-//fixme: fix event delegation for volume slider (it should be scrollable while hovering, not just after clicking it)
-//todo: add repeat function: make it repeat after the current song is done playing (need to check if current song is still playing?). change from current logic of simply restarting the song from the beginning
-//todo: make progress bar transition smoother?
-//todo: add slider functionality to have users skip through songs
-//todo: check audio files have loaded in before starting (NaN is begin returned prematurely for the tractTime() function) -- add an alert that music cannot be played when files are loading
-//todo: persist storage?
-//todo: drag and drop for playlists eventually
-// todo: slideshow of pics for each song
+// 4.7 This formats the currentTime of each audio object into a more readable format to display to the user.
+function formatTime(time) {
+    let min = Math.floor(time / 60);
+    if (min < 10) {
+        min = `${min}`;
+    }
+    let sec = Math.floor(time % 60);
+    if (sec < 10) {
+        sec = `0${sec}`;
+    }
+    return `${min}:${sec}`;
+}
