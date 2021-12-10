@@ -280,12 +280,10 @@ function checkEndOfSong() {
 
 // 4.6 Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
 function shufflePlaylist() {
-    console.log(`currentTrack: ${currentTrack}`);
     function randomize() {
         return Math.floor(Math.random() * (playlistLength - 0 + 1));
     }
     let randomTrack = randomize();
-    console.log(`randomTrack: ${randomTrack}`);
     if (randomTrack !== currentTrack) {
         currentTrack = randomTrack;
         return currentTrack;

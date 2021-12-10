@@ -19,7 +19,7 @@
         2.5 -- .track-name
         2.6 -- .song-tracker
         2.7 -- .button--prev, .button--next, .button--repeat, .button--pause, .button--shuffle, 
-                .volume-section
+            .volume-section
         2.8 -- Buttons special states @media (min-width: 40em)
         2.9 -- .button, .volume-control
         2.10 -- .button--play, .button--pause
@@ -82,7 +82,7 @@ footer {
     display: flex;
     width: 100%;
     position: absolute;
-    bottom: 2em;
+    bottom: 4em;
     justify-content: center;
 }
 @media (orientation: landscape) {
@@ -199,6 +199,13 @@ span {
         color: var(--white-80);
     }
 }
+@media (orientation: landscape) {
+    .button,
+    .volume-control {
+        font-size: 1em;
+        color: var(--white);
+    }
+}
 
 /* 2.10 Make this button a bit bigger than the rest to highlight its importance */
 .button--play,
@@ -272,7 +279,11 @@ span {
 }
 @media (orientation: landscape) {
     .volume-control {
+        opacity: 0.7;
         height: 4vh;
+    }
+    .volume-control:hover {
+        opacity: 1;
     }
 }
 
@@ -319,6 +330,15 @@ span {
     .progress {
         max-height: 4.5vh;
         opacity: 0.7;
+    }
+    .progress:hover {
+        opacity: 1;
+    }
+}
+@media (orientation: landscape) {
+    .progress {
+        opacity: 0.7;
+        height: 4vh;
     }
     .progress:hover {
         opacity: 1;
