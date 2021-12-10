@@ -39,7 +39,6 @@ const buttonNext = document.querySelector(".button--next");
 const buttonPrev = document.querySelector(".button--prev");
 const buttonShuffle = document.querySelector(".button--shuffle");
 const buttonRepeat = document.querySelector(".button--repeat");
-const volumeControl = document.querySelector(".volume-control");
 const track = document.querySelector(".track-number");
 const trackName = document.querySelector(".track-name");
 const headersWithinTrackName = document.querySelectorAll(".track-name > h3");
@@ -48,6 +47,8 @@ const trackTimeStart = document.querySelector(".track-time__start");
 const trackTimeEnd = document.querySelector(".track-time__end");
 const progress = document.querySelector(".progress");
 const volumeChange = document.querySelector(".volume-change");
+const volumeControl = document.querySelector(".volume-control");
+const volumeSection = document.querySelector(".volume-section");
 
 // Initialized variables -- some of these can be changed depending on the number of tracks to be added to the playlist over time
 let playlist = [];
@@ -78,9 +79,9 @@ function loadEventListeners() {
     buttonShuffle.addEventListener("click", shuffleTrack);
     buttonRepeat.addEventListener("click", repeatTrack);
     progress.addEventListener("input", inputCurrentTime);
-    // volumeChange.addEventListener("click", changeVolumeIcon);
+    volumeChange.addEventListener("click", changeVolumeIcon);
     volumeControl.addEventListener("input", setVolume);
-    window.addEventListener("resize", showVolumeControl);
+    window.addEventListener("resize", showVolumeSection);
 }
 
 /******************************************************************************
@@ -90,15 +91,15 @@ function loadEventListeners() {
 // 3.1 Handles a lot of logic when staring the app as well as when any song needs to play: sets the volume for the currentTrack; replaces the play button with the pause button; displays all other buttons and the volume control; defines the trackEndTime to display; defines the current time of the song to display, and checks what the next song played will be.
 function playTrack() {
     playlist[currentTrack].play();
-    setVolume();
     buttonPlay.replaceWith(buttonPause);
     buttonPause.style.display = "block";
     showHidden();
-    showVolumeControl();
+    showVolumeSection();
     trackTimeEnd.textContent = formatTime(playlist[currentTrack].duration);
     trackTimeStart.textContent = "0:00";
     showCurrentTime();
     checkEndOfSong();
+    setVolume();
 }
 
 // 3.2 Pauses the currentTrack and replaces the pause button with the play button
@@ -113,8 +114,7 @@ function nextTrack() {
     playlistLogic();
     if (buttonShuffle.children[1].classList.contains("shuffle-active")) {
         shufflePlaylist();
-    }
-    if (currentTrack < playlistLength) {
+    } else if (currentTrack < playlistLength) {
         currentTrack++;
     } else {
         currentTrack = 0;
@@ -164,7 +164,7 @@ function shuffleTrack() {
 
 // 3.7 Allows the user to seek through the song by using the slider bar
 function inputCurrentTime() {
-    progress.max = 99; //stop the user from seeking to the limit of 100, otherwise songs go into an infinite state
+    progress.max = 99; //stop the user from seeking to the limit of 100, otherwise songs go into a crazy looping state
     let sliderInput = (playlist[currentTrack].duration * progress.value) / 100;
     playlist[currentTrack].currentTime = sliderInput;
 }
@@ -187,36 +187,29 @@ function showHidden() {
     buttonNext.style.display = "block";
 }
 
-// 3.10 Makes sure that the volume control only shows on non-mobile displays.
-function showVolumeControl() {
+// 3.10 Makes sure that the volume section element only shows on non-mobile displays.
+function showVolumeSection() {
     // The number 640 is used as the limiter because it is 40em divided by 16 in pixels. 40em is the breakpoint in the CSS file from mobile to larger displays, so its used here for consistency, and 16 is the default calculated value used in the CSS too, as determined by the global font-size.
     // Check a button's current display before showing the volume control element -- if it is still not showing, neither should volume control (buttonShuffle is picked here, but any of the major buttons would do).
     // But if the button is showing, then the innerWidth of the page must not be mobile device for the control to show, too.
     if (window.innerWidth > 639 && buttonShuffle.style.display === "block") {
-        volumeControl.style.display = "block";
+        volumeSection.style.display = "flex";
     } else {
-        volumeControl.style.display = "none";
+        volumeSection.style.display = "none";
     }
 }
 
-// 3.11 todo: if the button is cliked, then mute it, otherwise turn it back to the last volume level. change the icon to me mute if its silent, little volume if its quiet-ish, and loud icon when its like over 70%.
+// 3.11 If the button is clicked, then mute it, otherwise turn it back to the last volume level. Change the icon to me mute if its silent, little volume if its quiet-ish, and loud icon when its over 70%.
 function changeVolumeIcon() {
     if (!volumeChange.children[0].classList.contains("fa-volume-mute")) {
-        console.log(volumeChange.children[0].classList);
+        volumeChange.children[0].classList.remove("fa-volume-up", "fa-volume-down");
         volumeChange.children[0].classList.add("fas", "fa-volume-mute");
         //set the volume to zero
+        playlist[currentTrack].volume = 0;
+    } else if (volumeChange.children[0].classList.contains("fa-volume-mute")) {
+        volumeChange.children[0].classList.remove("fa-volume-mute");
+        setVolume();
     }
-
-    // if (buttonRepeat.children[1].classList.contains("repeat")) {
-    //     buttonRepeat.children[1].classList.remove("repeat");
-    //     buttonRepeat.children[1].classList.add("one", "fas", "fa-circle");
-    // } else if (buttonRepeat.children[1].classList.contains("one")) {
-    //     buttonRepeat.children[1].classList.remove("one", "fa-circle");
-    //     buttonRepeat.children[1].classList.add("infinity", "fas", "fa-infinity");
-    // } else if (buttonRepeat.children[1].classList.contains("infinity")) {
-    //     buttonRepeat.children[1].classList.remove("infinity", "fas", "fa-infinity");
-    //     buttonRepeat.children[1].classList.add("repeat");
-    // }
 }
 
 /******************************************************************************
@@ -231,16 +224,16 @@ function getCurrentTime() {
 // 4.2 Gathers the value of the volumeControl element and sets the current track's volume to that number. If the volume is at zero, display the volumeChange button as muted; if its between 1 and 70%, show the volume-down icon; if its higher than 70%, show the volume-up icon.
 function setVolume() {
     let volume = (playlist[currentTrack].volume = volumeControl.value / 100);
-    // if (volume === 0) {
-    //     volumeChange.children[0].classList.add("fas", "fa-volume-mute");
-    //     volumeChange.children[0].classList.remove("fa-volume-down", "fa-volume-up");
-    // } else if (volume > 0 && volume < 0.7) {
-    //     volumeChange.children[0].classList.add("fas", "fa-volume-down");
-    //     volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-up");
-    // } else if (volume >= 0.7) {
-    //     volumeChange.children[0].classList.add("fas", "fa-volume-up");
-    //     volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-down");
-    // }
+    if (volume === 0) {
+        volumeChange.children[0].classList.add("fas", "fa-volume-mute");
+        volumeChange.children[0].classList.remove("fa-volume-down", "fa-volume-up");
+    } else if (volume > 0 && volume < 0.7) {
+        volumeChange.children[0].classList.add("fas", "fa-volume-down");
+        volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-up");
+    } else if (volume >= 0.7) {
+        volumeChange.children[0].classList.add("fas", "fa-volume-up");
+        volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-down");
+    }
     return volume;
 }
 
@@ -287,11 +280,13 @@ function checkEndOfSong() {
 
 // 4.6 Finds a random number between 0 and the playlistLength (inclusive) to return as the next currentTrack. If the number returned is the same as the currentTrack, the function is recalled recursively until a unique random track is returned.
 function shufflePlaylist() {
+    console.log(`currentTrack: ${currentTrack}`);
     function randomize() {
         return Math.floor(Math.random() * (playlistLength - 0 + 1));
     }
     let randomTrack = randomize();
-    if (randomTrack !== currentTrack && randomTrack !== currentTrack + 1) {
+    console.log(`randomTrack: ${randomTrack}`);
+    if (randomTrack !== currentTrack) {
         currentTrack = randomTrack;
         return currentTrack;
     } else {
