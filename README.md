@@ -10,7 +10,7 @@ I wanted to make this project not only because I love music, but I also wanted t
 
 The app is responsive using CSS media queries, meaning it works on different devices and with different screen sizes. Below are some examples.
 
-### [Mobile Portrait Orientation](./mobile_portrait_gif)
+### ![Mobile Portrait Orientation](./screenshot_mobile.png)
 
 ### ![Mobile Landscape Orientation](./mobile_landscape_gif)
 
