@@ -1,4 +1,4 @@
-# Music Player (v1.1.2)
+# Music Player (v1.1.3)
 
 This is a small [music player](https://paul-mcj.github.io/Music-Player/) application that plays, pauses, skips, repeats and shuffles songs! It also has slider controls for song seeking and volume input, as well as a mute button feature. All songs are originally composed and cannot be reproduced without the express written permission of their creator [mcjbeats](https://open.spotify.com/artist/1GePsi5X3577OuyoH1hN5H?si=JIUTE-1RTZetQXSl5wpk6g).
 
