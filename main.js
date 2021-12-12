@@ -223,7 +223,7 @@ function getCurrentTime() {
 
 // 4.2 Gathers the value of the volumeControl element and sets the current track's volume to that number. If the volume is at zero, display the volumeChange button as muted; if its between 1 and 70%, show the volume-down icon; if its higher than 70%, show the volume-up icon.
 function setVolume() {
-    let volume = (playlist[currentTrack].volume = volumeControl.value / 100);
+    let volume = volumeControl.value / 100;
     if (volume === 0) {
         volumeChange.children[0].classList.add("fas", "fa-volume-mute");
         volumeChange.children[0].classList.remove("fa-volume-down", "fa-volume-up");
@@ -234,7 +234,7 @@ function setVolume() {
         volumeChange.children[0].classList.add("fas", "fa-volume-up");
         volumeChange.children[0].classList.remove("fa-volume-mute", "fa-volume-down");
     }
-    return volume;
+    playlist[currentTrack].volume = volume;
 }
 
 // 4.3 Pauses the currentTrack and resets its currentTime back to the beginning (used in conjunction with other functions). This function is paramount in making sure audio tracks don't produce overlapping audio.
