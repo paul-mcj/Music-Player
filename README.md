@@ -163,7 +163,7 @@ I think there are some things that could be added to make it more immersive
 music stops), but the lightweight nature of the app works well, and I think
 shows my skills well!
 
-    ## Author
+## Author
 
 -    My Website: [paulmcjannet.com](https://www.paulmcjannet.com/)
 -    LinkedIn: [Paul McJannet](https://www.linkedin.com/in/paul-mcjannet/)
